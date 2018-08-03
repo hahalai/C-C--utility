@@ -53,6 +53,12 @@ int main(int argc, char *argv[])
     }
     int *pNumbers = (int *)malloc(nArrayLen * sizeof(int));
 
+    if (!pNumbers)
+    {
+        printf("malloc array failed.\n");
+        return 1;
+    }
+
     unsigned int i = 0;
     printf("Please input %d numbers:\n", nArrayLen);
     while (i < nArrayLen)
