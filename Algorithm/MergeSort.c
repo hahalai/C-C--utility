@@ -3,101 +3,122 @@
 
 #include "PrintArray.h"
 
-int MergeSort(int aResult[], unsigned int uResultArraySize, \
-        int aLeft[], unsigned int uLeftArraySize, \
-        int aRight[], unsigned int uRightArraySize)
+int MergeSort(int aNumbers[], unsigned int uLeftPos, \
+        unsigned int uMiddlePos, unsigned int uRightPos)
 {
-    if (!aResult || !aLeft || !aRight \
-            || (uResultArraySize != uLeftArraySize + uRightArraySize))
+    if (!aNumbers || !(uLeftPos <= uMiddlePos && uMiddlePos <= uRightPos))
     {
+        return 1;
+    }
+
+    unsigned int uLeftArraySize = uMiddlePos - uLeftPos + 1;
+    unsigned int uRightArraySize = uRightPos - uMiddlePos;
+    int *pLeftArray = (int *)malloc(uLeftArraySize * sizeof(int));
+    int *pRightArray = (int *)malloc(uRightArraySize * sizeof(int));
+    if (!pLeftArray || !pRightArray)
+    {
+        printf ("malloc left or right array failed.");
         return 1;
     }
 
     unsigned int i = 0;
     unsigned int j = 0;
+    for (i = 0; i <= uLeftArraySize; ++i)
+    {
+        pLeftArray[i] = aNumbers[uLeftPos+i];
+    }
+
+    for (j = 0; j <= uRightArraySize; ++j)
+    {
+        pRightArray[j] = aNumbers[uMiddlePos+1+j];
+    }
+
+    //PrintArray(pLeftArray, uLeftArraySize, "Left array sort");
+    //PrintArray(pRightArray, uRightArraySize, "Right array");
     unsigned int k = 0;
-    for (k = 0; k < uResultArraySize; ++k)
+    i = 0;
+    j = 0;
+
+    for (k = uLeftPos; k <= uRightPos; ++k)
     {
         if (i == uLeftArraySize)
         {
-            aResult[k] = aRight[j];
-            ++j;
+            aNumbers[k] = pRightArray[j++];
             continue;
         }
         else if (j == uRightArraySize)
         {
-            aResult[k] = aLeft[i];
-            ++i;
+            aNumbers[k] = pLeftArray[i++];
             continue;
         }
 
-        if (aLeft[i] <= aRight[j])
+        if (pLeftArray[i] <= pRightArray[j])
         {
-            aResult[k] = aLeft[i];
-            ++i;
+            aNumbers[k] = pLeftArray[i++];
         }
         else
         {
-            aResult[k] = aRight[j];
-            ++j;
+            aNumbers[k] = pRightArray[j++];
         }
+        //PrintArray(aNumbers+uLeftPos, (uRightPos - uLeftPos + 1), "*****array");
     }
 
     return 0;
 }
 
+int SortSubArray(int aNumbers[], unsigned int uLeftPos, unsigned int uRightPos)
+{
+    if (uLeftPos < uRightPos)
+    {
+        unsigned int uMiddlePos = (uRightPos + uLeftPos) / 2;
+        SortSubArray(aNumbers, uLeftPos, uMiddlePos);
+        SortSubArray(aNumbers, uMiddlePos + 1, uRightPos);
+        MergeSort(aNumbers, uLeftPos, uMiddlePos, uRightPos);
+    }
+    return 0;
+}
+
+int SortArray(int aNumbers[], unsigned int uNumbersArraySize)
+{
+    SortSubArray(aNumbers, 0, uNumbersArraySize-1);
+    return 0;
+}
 
 int main(int argc, char *argv[])
 {
-    if (3 != argc)
+    if (2 != argc)
     {
-        printf("Usage:%s array_a_size array_b_size.\n", argv[0]);
+        printf("Usage:%s array_size.\n", argv[0]);
         return 1;
     }
 
     unsigned int i = 0;
-    unsigned int j = 0;
-    int nLeftArraySize = atoi(argv[1]);
-    int nRightArraySize = atoi(argv[2]);
-    unsigned int uResultArraySize = 0;
+    int nArraySize = atoi(argv[1]);
 
-    if (0 >= nLeftArraySize || 0 >= nRightArraySize)
+    if (0 >= nArraySize)
     {
-        printf("array_a_size or array_b_size must be greater than 0.\n");
+        printf("array_size must be greater than 0.\n");
         return 1;
     }
 
-    uResultArraySize = nLeftArraySize + nRightArraySize;
-    int *pLeftArray = (int *)malloc(nLeftArraySize * sizeof(int));
-    int *pRighArray = (int *)malloc(nRightArraySize * sizeof(int));
-    int *pResultArray = (int *)malloc(uResultArraySize * sizeof(int));
+    int *pArray = (int *)malloc(nArraySize * sizeof(int));
 
-    if (!pLeftArray || !pRighArray || !pResultArray)
+    if (!pArray)
     {
-        printf("malloc array_a, array_b or array_result failed.\n");
+        printf("malloc array failed.\n");
         return 1;
     }
 
-    printf("Please input array a by asc:\n");
-    while (i < nLeftArraySize)
+    printf("Please input array:\n");
+    while (i < nArraySize)
     {
-        scanf("%d", pLeftArray + i);
-        pResultArray[i] = pLeftArray[i];
+        scanf("%d", pArray + i);
         ++i;
     }
-    printf("Please input array b by asc:\n");
-    while (j < nRightArraySize)
-    {
-        scanf("%d", pRighArray + j);
-        pResultArray[nLeftArraySize+j] = pRighArray[j];
-        ++j;
-    }
 
-    PrintArray(pLeftArray, nLeftArraySize, "LeftArray");
-    PrintArray(pRighArray, nRightArraySize, "RightArray");
-    PrintArray(pResultArray, uResultArraySize, "ResultArray before sort");
-    MergeSort(pResultArray, uResultArraySize, pLeftArray, nLeftArraySize, pRighArray, nRightArraySize);
-    PrintArray(pResultArray, uResultArraySize, "ResultArray after sort");
+    PrintArray(pArray, nArraySize, "Array before sort");
+    SortArray(pArray, nArraySize);
+    PrintArray(pArray, nArraySize, "Array after sort");
 
     return 0;
 }
