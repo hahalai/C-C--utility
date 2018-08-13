@@ -63,6 +63,16 @@ int MergeSort(int aNumbers[], unsigned int uLeftPos, \
         //PrintArray(aNumbers+uLeftPos, (uRightPos - uLeftPos + 1), "*****array");
     }
 
+    if (pLeftArray)
+    {
+        free(pLeftArray);
+    }
+
+    if (pRightArray)
+    {
+        free(pRightArray);
+    }
+
     return 0;
 }
 
@@ -120,5 +130,9 @@ int main(int argc, char *argv[])
     SortArray(pArray, nArraySize);
     PrintArray(pArray, nArraySize, "Array after sort");
 
+    if (pArray)
+    {
+        free(pArray);
+    }
     return 0;
 }
